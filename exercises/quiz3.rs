@@ -18,7 +18,7 @@
 
 use std::fmt::Display;
 
-pub struct ReportCard<T: Display> {
+pub struct ReportCard<T: Display + AllowedTypesMark> {
     pub grade: T,
     pub student_name: String,
     pub student_age: u8,
@@ -28,7 +28,12 @@ trait Printable {
     fn print(&self) -> String;
 }
 
-impl<T: Display> Printable for ReportCard<T> {
+pub trait AllowedTypesMark {}
+
+impl AllowedTypesMark for f32 {}
+impl AllowedTypesMark for String {}
+
+impl<T: Display + AllowedTypesMark> Printable for ReportCard<T> {
     fn print(&self) -> String {
         format!("{} ({}) - achieved a grade of {}",
             &self.student_name, &self.student_age, &self.grade)
@@ -64,4 +69,18 @@ mod tests {
             "Gary Plotter (11) - achieved a grade of A+"
         );
     }
+
+    // Does not compile!
+    // #[test]
+    // fn test() {
+    //     let report_card = ReportCard {
+    //         grade: true,
+    //         student_name: "Gary Plotter".to_string(),
+    //         student_age: 11,
+    //     };
+    //     assert_eq!(
+    //         report_card.print(),
+    //         "Gary Plotter (11) - achieved a grade of A+"
+    //     );
+    // }
 }
